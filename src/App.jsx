@@ -26,7 +26,7 @@ function App() {
     e.preventDefault();
     try {
       const newImage = await uploadImage(file);
-      setImages((prev) => [...prev, newImage]);
+      setImages((prev) => [...prev, getImage(newImage.path)]);
     } catch (error) {
       alert(error.message);
     }
@@ -47,9 +47,9 @@ function App() {
       <div>
         {images.map((image) => (
           <img
-            key={image.Key}
+            key={image.id}
             src={image.url}
-            alt={image.Key}
+            alt={image.name}
             style={{ width: 200 }}
           />
         ))}
