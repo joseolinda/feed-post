@@ -18,7 +18,7 @@ async function uploadImage(file) {
 
 async function getImage(path) {
     const { data, error } = await supabase.storage
-      .from('feed-images')
+      .from('imagens')
       .list(path);
 
     if (error) throw new Error('Error getting images:', error.message);
