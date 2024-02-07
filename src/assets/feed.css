@@ -52,3 +52,109 @@
     color: #999;
     cursor: pointer;
 }
+
+.newpost {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 300px;
+    position: relative;
+    float: left;
+    font-family: 'Roboto', sans-serif;
+}
+
+.newpost form {
+    display: flex;
+    flex-direction: column;
+}
+
+.newpost form input,
+.newpost form textarea {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.newpost form textarea {
+    height: 100px;
+}
+
+.newpost .action-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.newpost form button {
+    width: 48%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.hide {
+    display: none;
+}
+
+.newpost form .image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #ddd;
+    padding: 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.newpost form .image-preview {
+    position: relative;
+    border: 1px dashed #ddd;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.newpost form .image-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 5px;
+}
+
+.newpost form .image-preview svg {
+    position: absolute;
+    color: #ddd;
+    left: 10px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.newpost form .image-preview label svg {
+    color: #fff !important;
+    left: unset;
+    right: 10px;
+}
+
+.newpost form .image-preview strong {
+    position: absolute;
+    right: 30px;
+    color: #fff;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    bottom: 10px;
+}

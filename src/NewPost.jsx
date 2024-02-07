@@ -1,20 +1,27 @@
 import { useState, useEffect } from 'react'
 import { supabase, uploadImage, getImage } from '../services/supabase.js'
+import { FaFileImage, FaSave, FaTrash } from 'react-icons/fa'
 
-function NewPost( { onClose }) {
-    const [file, setfile] = useState([])
+function NewPost({ onClose }) {
+    const [file, setFile] = useState(null)
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (!file) {
+            alert('Nenhum arquivo selecionado.')
+            return
+        }
         try {
             const newImage = await uploadImage(file)
-            setImages((prev) => [...prev, getImage(newImage.path)])
+            setAllPosts((prev) => [...prev, getImage(newImage.path)])
         } catch (error) {
-            alert(error.message)
+            console.error('Erro ao enviar imagem:', error.message)
+            alert('Falha ao enviar imagem.')
         }
     }
 
     const handleFileSelected = (e) => {
-        setfile(e.target.files[0])
+        setFile(e.target.files[0])
     }
 
     const handleClose = () => {
@@ -22,11 +29,35 @@ function NewPost( { onClose }) {
     }
 
     return (
-        <div>
-            <h1>New Post</h1>
-            <button onClick={ handleClose }>Cancelar</button>
+        <div className='newpost'>
+            
             <form onSubmit={handleSubmit}>
-                <input type="file" name="image" onChange={handleFileSelected} />
+                <input type="text" name="title" placeholder="Título" />
+                <textarea name="content" placeholder="Conteúdo" />
+                <input className='hide' type="file" id='image-file' name="image-file" onChange={handleFileSelected} />
+                <label className='image-upload' htmlFor="image-file">
+                    <FaFileImage />
+                    <span>Escolha uma imagem</span>
+                </label>
+                <div className={'image-preview ' + (!file && 'hide')}>
+                    <FaTrash onClick={ () => setFile(null)} />
+                    <label htmlFor="image-file" >
+                        <span>
+                            <strong>Escolher outra imagem</strong>
+                            <FaFileImage />
+                        </span>
+                        {file && <img src={URL.createObjectURL(file)} alt="Imagem selecionada" />}
+                    </label>
+                </div>
+                <div className='action-buttons'>
+                    <button type='reset' onClick={handleClose}>
+                        Cancelar
+                    </button>
+                    <button type="submit">
+                        <FaSave /> Salvar
+                    </button>
+                </div>
+                
             </form>
         </div>
     )
