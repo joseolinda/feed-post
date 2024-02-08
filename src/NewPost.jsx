@@ -74,8 +74,14 @@ function NewPost({ onClose }) {
                         value={post.content}
                         onChange={(e) => setPost({ ...post, content: e.target.value })}
                     />
-                    <input className='hide' type="file" id='image-file' name="image-file" onChange={handleFileSelected} />
-                    <label className='image-upload' htmlFor="image-file">
+                    <input 
+                        className='hide' 
+                        type="file" 
+                        id='image-file' 
+                        name="image-file" 
+                        onChange={handleFileSelected} 
+                    />
+                    <label className={'image-upload ' + (file && 'hide')} htmlFor="image-file">
                         <FaFileImage />
                         <span>Escolha uma imagem</span>
                     </label>

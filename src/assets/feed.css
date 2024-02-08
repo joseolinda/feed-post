@@ -222,7 +222,7 @@
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 .newpost form .image-upload {
