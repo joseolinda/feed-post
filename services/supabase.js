@@ -24,7 +24,7 @@ function getImage(fullpath) {
     return {
         id: imageName.split('.')[0],
         name: imageName,
-        url: `${supabaseUrl}/storage/v1/object/public/imagens/${fullpath}`
+        url: `${supabaseUrl}/storage/v1/object/public/${fullpath}`
     }
 }
 

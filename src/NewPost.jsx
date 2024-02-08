@@ -1,9 +1,14 @@
 import { useState } from 'react'
-import { uploadImage, getImage } from '../services/supabase.js'
+import { supabase, uploadImage, getImage } from '../services/supabase.js'
 import { FaFileImage, FaSave, FaTimesCircle } from 'react-icons/fa'
 
 function NewPost({ onClose }) {
     const [file, setFile] = useState(null)
+    const [post, setPost] = useState({
+        title: '',
+        content: '',
+        image: ''
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -13,7 +18,26 @@ function NewPost({ onClose }) {
         }
         try {
             const newImage = await uploadImage(file)
-            setAllPosts((prev) => [...prev, getImage(newImage.path)])
+            const imageUrl = getImage(newImage.fullPath).url
+            setPost({ ...post, image: imageUrl })
+            const { data: { user } } = await supabase.auth.getUser()
+            const userId = user.id;
+            const { error } = await supabase
+                                    .from('posts')
+                                    .insert({
+                                        title: post.title,
+                                        content: post.content,
+                                        imageurl: imageUrl,
+                                        userid: userId
+                                    })
+
+            if (error) {
+                console.error('Erro ao inserir novo post:', error.message)
+                alert('Falha ao inserir novo post.')
+                return
+            }
+            onClose(false)
+
         } catch (error) {
             console.error('Erro ao enviar imagem:', error.message)
             alert('Falha ao enviar imagem.')
@@ -35,8 +59,19 @@ function NewPost({ onClose }) {
             <div className='newpost'>
 
                 <form onSubmit={handleSubmit}>
-                    <input type="text" name="title" placeholder="Título" />
-                    <textarea name="content" placeholder="Conteúdo" />
+                    <input
+                        type="text" 
+                        name="title" 
+                        placeholder="Título"
+                        value={post.title}
+                        onChange={(e) => setPost({ ...post, title: e.target.value })}    
+                    />
+                    <textarea 
+                        name="content" 
+                        placeholder="Conteúdo"
+                        value={post.content}
+                        onChange={(e) => setPost({ ...post, content: e.target.value })}
+                    />
                     <input className='hide' type="file" id='image-file' name="image-file" onChange={handleFileSelected} />
                     <label className='image-upload' htmlFor="image-file">
                         <FaFileImage />
