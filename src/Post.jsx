@@ -1,94 +1,127 @@
 import { useEffect, useState } from 'react'
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa'
-import { useLikesCount } from '../hooks/utils';
-import { supabase } from '../services/supabase';
+import PropTypes from 'prop-types'
+import { supabase } from '../services/supabase'
 
-import PropTypes from 'prop-types';
-
-function Post({ postid, userid, title, imageurl, content }) {
+function Post({ postid, title, imageurl, content, onDelete }) {
     const [isLiked, setIsLiked] = useState(false)
-    let likeCount = useLikesCount(postid)
-
-    const fetchLikes = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const id = user.id;
-        const { data, error } = await supabase
-            .from('likes')
-            .select()
-            .eq('postid', postid)
-            .eq('userid', id)
-
-        if (error) {
-            console.error('Error fetching likes:', error.message)
-            return
-        }
-
-        if (data) {
-            setIsLiked(data.length > 0)
-        }
-    }
+    const [likeCount, setLikeCount] = useState(0)
 
     useEffect(() => {
-        fetchLikes()
-    }, [isLiked])
-
-    async function addLike() {
-        const { data: { user } } = await supabase.auth.getUser()
-        const id = user.id;
-        const { error } = await supabase
-            .from('likes')
-            .insert({
-                postid: postid,
-                userid: id
-            })
-
-        if (error) {
-            console.error('Erro ao inserir novo like:', error.message)
-            return
+        const fetchLikesAndCheckUserLike = async () => {
+            await fetchLikes()
+            await checkUserLike()
         }
 
-    }
+        // Subscrever para mudanças na tabela de likes
+        const likesSubscription = supabase.channel('custom-all-channel')
+            .on(
+                'broadcast',
+                { event: '*', schema: 'public', table: 'likes' },
+                (payload) => {
+                    console.log('Change received!', payload)
+                    fetchLikes()
+                }
+            )
+            .subscribe()
 
-    async function removeLike() {
-        const { data: { user } } = await supabase.auth.getUser()
-        const id = user.id;
-        const { error } = await supabase
+        fetchLikesAndCheckUserLike()
+
+        // Cancelar a assinatura quando o componente é desmontado
+        return () => supabase.removeChannel(likesSubscription)
+    }, [likeCount])
+
+    // Busca a contagem de likes do post
+    const fetchLikes = async () => {
+        const { data, error } = await supabase
             .from('likes')
-            .delete()
+            .select('*', { count: 'exact' })
             .eq('postid', postid)
-            .eq('userid', id)
 
-        if (error) {
-            console.error('Erro ao remover like:', error.message)
-            return
+        if (!error) {
+            setLikeCount(data.length)
         }
     }
 
-    function apagar() {
-        return alert('Apagando post')
+    // Verifica se o usuário atual deu like no post
+    const checkUserLike = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            const { data } = await supabase
+                .from('likes')
+                .select()
+                .eq('postid', postid)
+                .eq('userid', user.id)
+
+            setIsLiked(data && data.length > 0)
+        }
     }
 
-    function handleLike() {
+    // Adiciona um like
+    const addLike = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            const { error } = await supabase
+                .from('likes')
+                .insert([{ postid: postid, userid: user.id }])
+            if (!error) {
+                setLikeCount(likeCount + 1)
+                setIsLiked(true)
+            }
+        }
+    }
+
+    // Remove um like
+    const removeLike = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            const { error } = await supabase
+                .from('likes')
+                .delete()
+                .match({ postid: postid, userid: user.id })
+            if (!error) {
+                setLikeCount(Math.max(0, likeCount - 1)) // Evita números negativos
+                setIsLiked(false)
+            }
+        }
+    }
+
+    // Manipula o clique no ícone de like
+    const handleLike = () => {
         if (isLiked) {
             removeLike()
         } else {
             addLike()
         }
+    }
 
-        setIsLiked(!isLiked)
+    // Deleta o post
+    const deletePost = async () => {
+        const { data: error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('postid', postid)
+        
+        onDelete(postid)
+
+        if (error) {
+            console.error('Erro ao deletar post:', error.message)
+            alert('Falha ao deletar post.')
+            return
+        }
     }
 
     return (
         <div className="post">
             <h1 className="header">{title}</h1>
-            <FaTrash className='delete' onClick={apagar} />
+            <FaTrash className="delete" onClick={ deletePost } />
             <img src={imageurl} alt={title} />
             <p className="content">{content}</p>
-            <div className='curtidas'>
+            <div className="curtidas">
                 <span>{likeCount} curtidas</span>
-                { isLiked ? (
-                    <FaHeart fill='#f09' onClick={handleLike} />
-                ): (
+                {isLiked ? (
+                    <FaHeart fill="#f09" onClick={handleLike} />
+                ) : (
                     <FaRegHeart onClick={handleLike} />
                 )}
             </div>
@@ -101,6 +134,7 @@ Post.propTypes = {
     title: PropTypes.string.isRequired,
     imageurl: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
-};
+    onDelete: PropTypes.func.isRequired,
+}
 
 export default Post
