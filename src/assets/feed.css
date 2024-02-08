@@ -4,6 +4,104 @@
     box-sizing: border-box;
 }
 
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    margin: 20px auto 0;
+    height: auto;
+    min-height: 90vh;
+}
+
+.app button, .app input, .app textarea {
+    font-family: 'Roboto', sans-serif;
+}
+
+.app header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 40px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.app header h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+}
+
+.app header h2 {
+    font-size: 18px;
+    font-weight: 300;
+    color: #666;
+}
+
+.app header button,
+.post-area .btn.addpost {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    right: 40px;
+}
+
+.app header button svg,
+.post-area .btn.addpost svg {
+    margin-right: 10px;
+}
+
+.app header button {
+    top: 10px;
+    background-color: #F80;
+}
+
+.app header button:hover {
+    background-color: #F60;
+}
+
+.post-area {
+    width: 100%;
+    padding: 20px;
+}
+
+.post-area #no-posts {
+    display: block;
+    padding: 80px 20px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 80%;
+    text-align: center;
+}
+
+.post-area .btn.addpost {
+    background-color: #ff0099;
+    bottom: 20px;
+    position: fixed;
+    z-index: 998;
+    box-shadow: 0 10px 5px rgba(0,0,0,0.1), -2px -2px 10px rgba(0,0,0,0.1);
+    transition: bottom 0.3s;
+}
+
+.post-area .btn.addpost:hover {
+    background-color: #ff0077;
+    bottom: 25px;
+}
+
+
+
 .post {
     padding: 10px 20px;
     margin: 10px;
@@ -15,7 +113,7 @@
     max-width: 300px;
     position: relative;
     float: left;
-    font-family: 'Roboto', sans-serif;
+    
 }
 
 .post .header {
@@ -78,7 +176,7 @@
     max-width: 520px;
     position: relative;
     float: left;
-    font-family: 'Roboto', sans-serif;
+    
 }
 
 .newpost form {
@@ -92,7 +190,7 @@
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-family: 'Roboto', sans-serif;
+    
 }
 
 .newpost form textarea {
@@ -111,7 +209,7 @@
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-family: 'Roboto', sans-serif;
+    
     background-color: #fff;
     cursor: pointer;
 }

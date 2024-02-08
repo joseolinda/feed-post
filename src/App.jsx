@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { supabase, uploadImage, getImage } from '../services/supabase.js';
+import  { useEffect, useState } from 'react';
+import { supabase } from '../services/supabase.js';
 import { useSession } from '../hooks/utils.js';
 
 import Login from './Login';
 import Feed from './Feed';
 import NewPost from './NewPost';
+import { FaDoorOpen, FaPlus } from 'react-icons/fa'
 
 function App() {
   const [session] = useSession();
@@ -43,17 +44,24 @@ function App() {
   }
 
   return (
-    <main>
+    <main className='app'>
       <header>
         <h1>FeedPosts</h1>
-        <h2>Sua nova rede social</h2>
-        <button onClick={handleLogout}>Sair</button>
+        <h2>Sua nova rede social.</h2>
+        <button onClick={handleLogout}>
+          <FaDoorOpen />
+          Fazer logoff
+        </button>
       </header>
-      {!showNewPost && <button className='btn addpost' onClick={() => setShowNewPost(true)}>New Post</button>}
+      <div className='post-area'>
 
-      {allPosts.length > 0 ? <Feed posts={allPosts} /> : "Ninguém postou nada"}
+        {!showNewPost && <button className='btn addpost' onClick={() => setShowNewPost(true)}><FaPlus /> Novo Post</button>}
 
-      {showNewPost && <NewPost onClose={ setShowNewPost } />}
+        {allPosts.length > 0 ? <Feed posts={allPosts} /> : <strong id='no-posts'>Ninguém postou nada ainda.</strong>}
+
+        {showNewPost && <NewPost onClose={ setShowNewPost } />}
+
+      </div>
     </main>
   );
 }
