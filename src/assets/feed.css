@@ -76,6 +76,10 @@
     padding: 20px;
 }
 
+.post-area.login {
+    max-width: 520px;
+}
+
 .post-area #no-posts {
     display: block;
     padding: 80px 20px;

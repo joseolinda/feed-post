@@ -1,38 +1,91 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa'
+import { useLikesCount } from '../hooks/utils';
+import { supabase } from '../services/supabase';
 
-function Post({ id, titulo, imagem, conteudo, onDelete }) {
+import PropTypes from 'prop-types';
+
+function Post({ postid, userid, title, imageurl, content }) {
     const [isLiked, setIsLiked] = useState(false)
-    const [likes, setLikes] = useState(15)
-    const [urlImage, setUrlImage] = useState(imagem)
+    let likeCount = useLikesCount(postid)
+
+    const fetchLikes = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const id = user.id;
+        const { data, error } = await supabase
+            .from('likes')
+            .select()
+            .eq('postid', postid)
+            .eq('userid', id)
+
+        if (error) {
+            console.error('Error fetching likes:', error.message)
+            return
+        }
+
+        if (data) {
+            setIsLiked(data.length > 0)
+        }
+    }
+
+    useEffect(() => {
+        fetchLikes()
+    }, [isLiked])
+
+    async function addLike() {
+        const { data: { user } } = await supabase.auth.getUser()
+        const id = user.id;
+        const { error } = await supabase
+            .from('likes')
+            .insert({
+                postid: postid,
+                userid: id
+            })
+
+        if (error) {
+            console.error('Erro ao inserir novo like:', error.message)
+            return
+        }
+
+    }
+
+    async function removeLike() {
+        const { data: { user } } = await supabase.auth.getUser()
+        const id = user.id;
+        const { error } = await supabase
+            .from('likes')
+            .delete()
+            .eq('postid', postid)
+            .eq('userid', id)
+
+        if (error) {
+            console.error('Erro ao remover like:', error.message)
+            return
+        }
+    }
 
     function apagar() {
-        onDelete(id)
+        return alert('Apagando post')
     }
 
     function handleLike() {
         if (isLiked) {
-            setLikes(likes - 1)
+            removeLike()
         } else {
-            setLikes(likes + 1)
+            addLike()
         }
 
         setIsLiked(!isLiked)
     }
 
-    function handleNewImage() {
-        const newImage = imagem.substring(0, imagem.length - 2) + (Math.random() * 10)
-        setUrlImage(newImage)
-    }
-
     return (
         <div className="post">
-            <h1 className="header">{titulo}</h1>
+            <h1 className="header">{title}</h1>
             <FaTrash className='delete' onClick={apagar} />
-            <img src={urlImage} alt={titulo} onClick={handleNewImage} />
-            <p className="content">{conteudo}</p>
+            <img src={imageurl} alt={title} />
+            <p className="content">{content}</p>
             <div className='curtidas'>
-                <span>{likes} curtidas</span>
+                <span>{likeCount} curtidas</span>
                 { isLiked ? (
                     <FaHeart fill='#f09' onClick={handleLike} />
                 ): (
@@ -42,5 +95,12 @@ function Post({ id, titulo, imagem, conteudo, onDelete }) {
         </div>
     )
 }
+
+Post.propTypes = {
+    postid: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    imageurl: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired,
+};
 
 export default Post

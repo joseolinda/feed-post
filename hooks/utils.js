@@ -22,4 +22,30 @@ function useSession() {
     return [session, setSession]
 }
 
-export { useSession }
+function useLikesCount(postId) {
+    const [likes, setLikes] = useState(0)
+
+    useEffect(() => {
+        const fetchLikes = async () => {
+            const { data, error } = await supabase
+                .from('likes')
+                .select()
+                .eq('postid', postId)
+
+            if (error) {
+                console.error('Error fetching likes:', error.message)
+                return
+            }
+
+            if (data) {
+                setLikes(data.length)
+            }
+        }
+
+        fetchLikes()
+    }, [postId])
+
+    return likes
+}
+
+export { useSession, useLikesCount }

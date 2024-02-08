@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { supabase, uploadImage, getImage } from '../services/supabase.js'
 import { FaFileImage, FaSave, FaTimesCircle } from 'react-icons/fa'
 
+import PropTypes from 'prop-types';
+
 function NewPost({ onClose }) {
     const [file, setFile] = useState(null)
     const [post, setPost] = useState({
@@ -101,5 +103,9 @@ function NewPost({ onClose }) {
         </div>
     )
 }
+
+NewPost.propTypes = {
+    onClose: PropTypes.func.isRequired
+};
 
 export default NewPost

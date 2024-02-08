@@ -22,9 +22,7 @@ function App() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('postid', 'userid', 'title', 'content', 'imageurl');
+      const { data, error } = await supabase.from('posts').select()
 
       if (error) {
         console.error('Error fetching posts:', error.message);
@@ -32,6 +30,7 @@ function App() {
       }
 
       if (data) {
+        console.log('Posts:', data);
         setAllPosts(data);
       }
     };
@@ -40,7 +39,16 @@ function App() {
   }, []);
 
   if (!session) {
-    return <Login />;
+    return (
+      <main className='app'>
+        <header>
+          <h1>FeedPosts</h1>
+          <h2>Sua nova rede social.</h2>
+        </header>
+        <div className='post-area login'>
+          <Login />
+        </div>
+    </main>);
   }
 
   return (
